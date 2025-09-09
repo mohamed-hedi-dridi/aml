@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Agent;
 use App\Models\SuspectMandat;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -11,10 +12,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Western extends Model
 {
     use HasFactory;
-    protected $connection = 'DB_Western';
-    protected $fillable = ['Prenom', 'Nom' , 'date', 'CIN','Dead'];
+    //protected $connection = 'Post_Funding_DB';
     public $timestamps = false;
-    protected $table = 'identity_check';
+    //protected $table = 'Western_Union';
+    protected $connection = 'localhostdb';
+    protected $table = 'zepz';
 
     public function getCSS($statut){
         if($statut == 0){
@@ -88,6 +90,16 @@ class Western extends Model
 
     public function getStatusListe(){
         $latestSuspect = SuspectMandat::where('code',$this->code)->orderBy('id','desc')->get();
+        return $latestSuspect;
+    }
+
+    public function agent()
+    {
+        return $this->belongsTo(Agent::class, 'email_agent', 'email');
+    }
+
+    public function getStatusKYC($code){
+        $latestSuspect = KYC::where('code',$code)->orderBy('id','asc')->exists();
         return $latestSuspect;
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\MandatsCentral;
+use Monolog\Handler\MandrillHandler;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\CtafController;
 use App\Http\Controllers\RoleController;
@@ -24,13 +26,13 @@ use App\Http\Controllers\MenuSideBarController;
 | be assigned to the "web" middleware group. Make something great!
 |
 */
+    Route::get('/MandatsCentral', [MandatController::class, 'gerenewtable']);//->name('admin.mandats.index')->middleware('permission:View All Mandats International');
 
 Route::get('/', function () {
     return redirect('/dashboard');
 });
 
 Route::get('/dashboard', function () {
-    //dd(date('Y-m-d'));
     return view('dashboard');
 })->middleware(['auth', 'verified' ,'auth.timeout'])->name('home');
 
@@ -76,16 +78,19 @@ Route::group(['prefix' => 'admin','App\Http\Controllers' => 'UserController', 'm
 
 Route::group(['prefix' => 'admin','App\Http\Controllers' => 'MandatController', 'middleware' => ['auth','auth.timeout']], function () {
     Route::get('/mandats/{type}', [MandatController::class, 'index'])->name('admin.mandats.index')->middleware('permission:View All Mandats International');
-    Route::get('/mandats_national', [MandatController::class, 'mandat_nationale'])->name('admin.mandats.index')->middleware('permission:View All Mandats National');
-    Route::post('/mandats/import', [MandatController::class, 'import'])->name('admin.mandats.import')->middleware('permission:Import Mandats');
-    Route::get('/mandats/types/mandats',[MandatController::class, 'type'])->name('admin.mandats.type')->middleware('permission:Type Mandats');
-    Route::POST('/mandats/types', [MandatController::class , 'store'])->name('admin.mandats.store')->middleware('permission:Add Type Mandats');
+    Route::get('/mandats_national', [MandatController::class, 'mandat_nationale'])->name('admin.mandats.indexNat')->middleware('permission:View All Mandats National');
+    Route::post('/import-mandats', [MandatController::class, 'import'])->name('admin.mandats.import')->middleware('permission:Import Mandats');
+    Route::get('/mandat-types/mandats',[MandatController::class, 'type'])->name('admin.mandats.type')->middleware('permission:Type Mandats');
+    Route::POST('/types_mandats', [MandatController::class , 'store'])->name('admin.mandats.store')->middleware('permission:Add Type Mandats');
     Route::get('/mandat/{id}',[MandatController::class , 'view'])->name('admin.mandats.view')->middleware('permission:view mandat');
-    Route::POST('/mandats/updateStatus', [MandatController::class , 'updateStatus'])->name('admin.mandats.updateStatus')->middleware('permission:Update Status Mandat');
+    Route::POST('/updateStatusMandat', [MandatController::class , 'updateStatus'])->name('admin.mandats.updateStatus')->middleware('permission:Update Status Mandat');
     Route::get('/ajax/mandats', [MandatController::class, 'ajaxListeMandat'])->name('admin.mandats.ajaxListeMandat');
+    Route::get('/getImage', [MandatController::class, 'getImage'])->name('admin.mandats.getImage');
+    Route::get('/detailAgentMandats',[MandatController::class , 'detailAgentMandats']) ;
+
 });
 
-Route::group(['prefix' => 'admin','App\Http\Controllers' => 'MandatController', 'middleware' => ['auth','auth.timeout']], function () {
+Route::group(['prefix' => 'admin','App\Http\Controllers' => 'BlacklistController', 'middleware' => ['auth','auth.timeout']], function () {
     Route::get('/blacklist', [BlacklistController::class, 'index'])->name('admin.blacklist.index')->middleware('permission:View All Blacklist');
     Route::post('/blacklist/import', [BlacklistController::class, 'import'])->name('admin.blacklist.import')->middleware('permission:Import Blacklist');
     Route::get('/blacklist/old', [BlacklistController::class, 'old'])->name('admin.blacklist.oled')->middleware('permission:View old Blacklist');
@@ -110,9 +115,11 @@ Route::group(['prefix' => 'admin','App\Http\Controllers' => 'InterneController',
 Route::group(['prefix' => 'admin','App\Http\Controllers' => 'AgentController', 'middleware' => ['auth','auth.timeout']], function () {
     Route::get('/Agents', [AgentController::class, 'index'])->name('admin.Agent.index')->middleware('permission:View Liste Agent');
     Route::post('/Agent/store', [AgentController::class, 'store'])->name('admin.Agent.store')->middleware('permission:Add Agent');
+    Route::post('/Agent/edit/{email}', [AgentController::class, 'edit'])->name('admin.Agent.edit')->middleware('permission:Add Agent');
+
     Route::get('/Agent/exist/{email}' ,[AgentController::class, 'isExistAgent'] );
     Route::post('/Agent/KYC', [AgentController::class, 'updateKYC'])->name('admin.Agent.updateKYC');
-
+    Route::get('/Agent/{email}', [AgentController::class, 'getAgent'])->name('admin.Agent.get');
 });
 
 Route::group(['prefix' => 'admin','App\Http\Controllers' => 'NationUnisController', 'middleware' => ['auth','auth.timeout']], function () {
@@ -121,5 +128,7 @@ Route::group(['prefix' => 'admin','App\Http\Controllers' => 'NationUnisControlle
     Route::post('NationUnis/valider', [NationUnisController::class, 'valider'])->name('admin.NationUnis.valider')->middleware('permission:Import Nation unis');
 
 });
+
+Route::get("getImageKWY", [MandatController::class , 'getImageKWY']) ;
 
 require __DIR__.'/auth.php';

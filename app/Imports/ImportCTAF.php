@@ -24,7 +24,7 @@ class ImportCTAF implements ToCollection
                 $ctaf = Ctaf::query()->update(['old' => 1]);
                 foreach ($rows as $key => $row) {
                     if($key>0){
-                        if($this->Verif($row) == true){
+                        if(true == true){
                             Ctaf::create ([
                                 "NUM_PASSPORT"=>$row[0],
                                 "NOM_PRENOM"=>$row[1]
@@ -48,6 +48,7 @@ class ImportCTAF implements ToCollection
                 DB::connection('DB_Prod')->rollBack();
             }
         }
+
     }
 
     private function Verif($row){

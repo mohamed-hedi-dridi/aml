@@ -32,7 +32,7 @@ class ImportInterne implements ToCollection
                             ]);
                             InternVmProd::create ([
                                 "Ref"=>$row[0],
-                                "NOM_PRENOM"=>$row[1],
+                                "NOM & PRENOM"=>$row[1],
                                 "CIN"=>$row[2]
                             ]);
                         }else{
@@ -45,7 +45,7 @@ class ImportInterne implements ToCollection
                 DB::connection('mysql')->commit();
                 DB::connection('DB_Prod')->commit();
             } catch (\Throwable $th) {
-                Log::channel('error')->error($e->getMessage(), ['user' => Auth::user()->name ,'line' => $e->getLine()]);
+                Log::channel('error')->error($th->getMessage(), ['user' => Auth::user()->name ,'line' => $th->getLine()]);
                 DB::connection('mysql')->rollBack();
                 DB::connection('DB_Prod')->rollBack();
             }

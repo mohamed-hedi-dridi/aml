@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
@@ -176,5 +177,30 @@ class UserController extends Controller
             Log::channel('error')->error($e->getMessage(), ['user' => Auth::user()->name,'line' => $e->getLine()]);
             return redirect()->back()->with( ['status' => 'error' , 'message' => $e->getMessage()] );
         }
+    }
+
+    public function login(Request $request){
+        if(!Auth::attempt($request->only('email','password'))){
+            return response([
+                "message" =>"invalid User"
+            ],Response::HTTP_UNAUTHORIZED);
+        }
+        $user = Auth::user();
+        $token = $user->createToken('token')->plainTextToken;
+        return response([
+            "token" => $token ,
+            "user" => $user
+        ]);
+    }
+
+
+    function alluser(){
+        try {
+            $users = User::all();
+            return response($users , Response::HTTP_OK);
+        } catch (\Exception $e) {
+            return response ( ['status' => 'error' , 'message' => $e->getMessage()] );
+        }
+
     }
 }

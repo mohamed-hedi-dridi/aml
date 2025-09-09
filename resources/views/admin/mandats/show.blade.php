@@ -38,6 +38,7 @@
                                         }else{
                                             $statut = ["class"=>"warning" , "text"=>"En cours"];
                                         }
+                                        $listes = $mandat->listeIteration();
                                     @endphp
                                     <a class="btn btn-{{ @$statut["class"] }} @can('Update Status Mandat')
                                             @if(@$latestSuspect->statut == 1 ) dropdown-toggle @endif @endcan" role="button" href="#" data-toggle="dropdown">
@@ -65,7 +66,7 @@
                                 @if($mandat->email_agent != null)
                                     <p class="font-14 mb-5">Email Agent: <strong class="weight-600">{{ $mandat->email_agent }}</strong></p>
                                 @endif
-                                <p class="font-14 mb-5">Nombre d'itération : <strong class="weight-600">{{ $mandat->iteration() }}</strong></p>
+                                <p class="font-14 mb-5">Nombre d'itération : <strong class="weight-600">{{ count($listes) }}</strong></p>
 							</div>
 							<div class="col-md-6">
 								<div class="text-right">
@@ -115,28 +116,30 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <td><strong> N° d'Identité </strong></td>
-                                                <td><strong> N° d'Identité </strong> </td>
+                                                <td><strong> Identité Input </strong></td>
+                                                <td><strong> Identité Output </strong> </td>
                                                 <td><strong> Date </strong></td>
                                                 <td><strong> État </strong></td>
+                                                <td><strong> Image </strong></td>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach ( $mandat->getStatusListe() as $key=>$liste)
+                                            @foreach ( $listes as $key=>$liste)
                                                 @php
-                                                    $statutiteration = $mandat->getCSS($liste->statut);
+                                                    $statutiteration = $mandat->getCSS($liste["status"]);
                                                 @endphp
                                                 <tr>
-                                                    @if($liste->user_id == null)
-                                                    <td> {{ $liste->input_identity }} </td>
-                                                    <td> {{ $liste->output_identity }} </td>
-                                                    <td> {{ $liste->date_modif }} </td>
-                                                    <td> <span class="badge badge-pill badge-{{ @$statutiteration["class"] }}"> {{ @$statutiteration["text"] }} </span></td>
-                                                    @else
-                                                    <td colspan="2"> <strong>{{ $liste->user->name }}</strong>  a changé le statut du mondat </td>
-                                                    <td> {{ $liste["date_modif"] }} </td>
-                                                    <td> <span class="badge badge-pill badge-{{ @$statutiteration["class"] }}"> {{ @$statutiteration["text"] }} </span></td>
+                                                    @if(@$liste["user_id"] == false)
+                                                        <td> {{ $liste["input_identity"] }} </td>
+                                                        <td> {{ $liste["output_identity"] }} </td>
+                                                        <td> {{ $liste['date'] }} </td>
+                                                        <td> <span class="badge badge-pill badge-{{ @$statutiteration["class"] }}"> {{ @$statutiteration["text"] }} </span></td>
+                                                    @elseif(1== 2)
+                                                        <td colspan="2"> <strong>{{ $liste->user->name }}</strong>  a changé le statut du mondat </td>
+                                                        <td> {{ $liste["date_modif"] }} </td>
+                                                        <td> <span class="badge badge-pill badge-{{ @$statutiteration["class"] }}"> {{ @$statutiteration["text"] }} </span></td>
                                                     @endif
+                                                    <td><a href="{{ route('admin.mandats.getImage', ['date' => $liste['date'] , 'filename' => $liste['image_cin'] , 'type' =>$type]) }}"> <i class="icon-copy fa fa-cloud-download" aria-hidden="true"></i></a></td>
                                                 </tr>
                                             @endforeach
 

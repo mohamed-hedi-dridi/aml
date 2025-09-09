@@ -5,12 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class InternVmProd extends Model
+class RiaMoney extends Model
 {
     use HasFactory;
-    protected $fillable = ['Ref', 'NOM & PRENOM', 'CIN'];
-    protected $table = 'VM';
+    protected $connection = 'transferInternationalPostFending';
     public $timestamps = false;
-    protected $connection = 'DB_Prod';
-
+    protected $table = 'ria_details';
 }

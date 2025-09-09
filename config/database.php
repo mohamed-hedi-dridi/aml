@@ -43,6 +43,26 @@ return [
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
         ],
 
+        'localhostdb' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => 'localhost',
+            'port' => '3306',
+            'database' => 'aml',
+            'username' => 'root',
+            'password' => '',
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
@@ -56,6 +76,43 @@ return [
             'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
             'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
+        'transferInternationalPostFending' =>[
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => '10.90.90.98',
+            'port' => '3306',
+            'database' => 'transferInternationalPostFending',
+            'username' => 'viauserdb',
+            'password' => 'uL3uTI0Vh@',
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'prefix_indexes' => true,
+            'strict' => true,
+            'engine' => null,
+            'options' => extension_loaded('pdo_mysql') ? array_filter([
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
+            ]) : [],
+        ],
+
+        'Post_Funding_DB' => [
+            'driver' => 'mysql',
+            'host' => '10.90.90.101',
+            'port' => '3306',
+            'database' => 'Post_Funding_DB',
+            'username' => 'root',
+            'password' => 'ycm#Byfs19GMCqr',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([

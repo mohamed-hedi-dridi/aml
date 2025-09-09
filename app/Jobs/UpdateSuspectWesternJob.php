@@ -3,7 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\Setting;
-use App\Models\Western;
+use App\Models\Kyc;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Queue\SerializesModels;
@@ -32,7 +32,7 @@ class UpdateSuspectWesternJob implements ShouldQueue
         Log::channel('info')->error("In Liste western Updated");
         try {
             $idIdentityCheck = Setting::find(1);
-            $identityChecks = Western::where('id', '>', $idIdentityCheck->Western)->orderBy('id','desc')->get();
+            $identityChecks = Kyc::where('id', '>', $idIdentityCheck->Western)->orderBy('id','desc')->get();
             if(COUNT($identityChecks)>0){
                 foreach ($identityChecks as $identityCheck) {
                     $identityCheck->storeSuspect();

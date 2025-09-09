@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AutoLogout extends Middleware
 {
-    protected $timeout = 30; // Set the timeout in minutes.
+    protected $timeout = 180; // Set the timeout in minutes.
 
     public function handle($request, Closure $next, ...$guards)
     {
@@ -19,7 +19,7 @@ class AutoLogout extends Middleware
             $lastActivity = session('last_activity');
 
             // Check if the user has been inactive for the specified duration
-            if (time() - $lastActivity > $this->timeout * 30) {
+            if (time() - $lastActivity > $this->timeout * 60) {
                 Auth::logout();
                 session()->flush();
                 return redirect('/login'); //->with('logout_message', 'You have been logged out due to inactivity.');

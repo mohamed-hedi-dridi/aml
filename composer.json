@@ -12,7 +12,9 @@
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.3",
         "laravel/tinker": "^2.8",
+        "league/flysystem-sftp-v3": "^3.29",
         "maatwebsite/excel": "^3.1",
+        "phpseclib/phpseclib": "3.0",
         "spatie/laravel-permission": "^6.0"
     },
     "require-dev": {
@@ -29,8 +31,11 @@
             "App\\": "app/",
             "Database\\Factories\\": "database/factories/",
             "Database\\Seeders\\": "database/seeders/"
-        }
-    },
+        },
+        "files": [
+                "app/Helpers/helpers.php"
+            ]
+        },
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests/"

@@ -33,26 +33,6 @@
                                     </div>
                                 @endcan
 							</div>
-                            <div class="clearfix mb-30">
-                                    <div class="header-left">
-                                        <div class="menu-icon dw dw-menu"></div>
-                                        <div class="search-toggle-icon dw dw-search2" data-toggle="header_search"></div>
-                                        <div class="header-search">
-                                            <form>
-                                                <input type="hidden" value="{{ $type }}" id="type">
-
-                                                <div class="form-group mb-20">
-                                                    <i class="dw dw-search2 search-icon"></i>
-                                                    <input type="text" class="form-control search-input codeMandat" name="code" id="code" placeholder="Tapez le code mandat">
-                                                </div>
-                                                <div class="form-group mb-0">
-                                                    <i class="dw dw-search2 search-icon"></i>
-                                                    <input class="form-control search-input input_identity" name="input_identity" id="input_identity" placeholder="Tapez Ouput Identity"  type="text">
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-								</div>
                             <div id="index">
                                 @include('admin.mandats.layoutAjax')
                             </div>

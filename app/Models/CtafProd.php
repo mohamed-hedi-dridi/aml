@@ -10,7 +10,7 @@ class CtafProd extends Model
     use HasFactory;
     protected $connection = 'DB_Prod';
     protected $fillable = ['NUM_PASSPORT', 'NOM_PRENOM'];
-    protected $table = 'ctaf';
+    protected $table = 'CTAF';
     public $timestamps = false;
 
 }

@@ -31,7 +31,7 @@ return [
     |
     */
 
-    'lifetime' => env('SESSION_LIFETIME', 120),
+    'lifetime' => env('SESSION_LIFETIME', 200),
 
     'event' => JulioMotol\AuthTimeout\Events\AuthTimedOut::class,
 

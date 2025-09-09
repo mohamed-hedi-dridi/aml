@@ -13,26 +13,30 @@ $('document').ready(function(){
 			searchPlaceholder: "Search",
 			paginate: {
 				next: '<i class="ion-chevron-right"></i>',
-				previous: '<i class="ion-chevron-left"></i>'  
+				previous: '<i class="ion-chevron-left"></i>'
 			}
 		},
 	});
 
 	$('.data-table-export').DataTable({
 		scrollCollapse: true,
-		autoWidth: false,
-		responsive: true,
+        autoWidth: false,
+        responsive: true,
+        searching: true,
+        bLengthChange: false,
+        bPaginate: true,
+        bInfo: true,
 		columnDefs: [{
 			targets: "datatable-nosort",
 			orderable: false,
 		}],
-		"lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+		"lengthMenu": [[25, 50, 100, -1], [25, 50, 100,"All"]],
 		"language": {
 			"info": "_START_-_END_ of _TOTAL_ entries",
 			searchPlaceholder: "Search",
 			paginate: {
 				next: '<i class="ion-chevron-right"></i>',
-				previous: '<i class="ion-chevron-left"></i>'  
+				previous: '<i class="ion-chevron-left"></i>'
 			}
 		},
 		dom: 'Bfrtp',
@@ -66,7 +70,7 @@ $('document').ready(function(){
 			searchPlaceholder: "Search",
 			paginate: {
 				next: '<i class="ion-chevron-right"></i>',
-				previous: '<i class="ion-chevron-left"></i>'  
+				previous: '<i class="ion-chevron-left"></i>'
 			}
 		},
 		'columnDefs': [{

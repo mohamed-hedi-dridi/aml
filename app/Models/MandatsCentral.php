@@ -5,8 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class TypeMandat extends Model
+class MandatsCentral extends Model
 {
     use HasFactory;
-    protected $table = 'type_mandats';
+    protected $connection = 'localhostdb';
+    protected $table = 'Mandats_central';
+    
 }

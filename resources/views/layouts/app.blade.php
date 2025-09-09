@@ -3,7 +3,7 @@
     <head>
         <!-- Basic Page Info -->
         <meta charset="utf-8">
-        <title>Via Mobile Reclamation</title>
+        <title>Via Mobile</title>
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <!-- Site favicon -->
         <link rel="apple-touch-icon" sizes="180x180" href="/vendors/images/cropped-faviconFinal-50x50.png">

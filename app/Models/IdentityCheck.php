@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Kyc;
 use App\Models\SuspectMandat;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -25,7 +26,13 @@ class IdentityCheck extends Model
         if($statut == 2){
             return ["class"=>"danger" , "text"=>"Bloqué Définitivement"];
         }
-        return ["class"=>"success" , "text"=>"Remboursé"];
+        if($statut == "VALIDATED"){
+            return ["class"=>"success" , "text"=>"Valid"];
+        }elseif($statut == "NOT_VALIDATED"){
+            return ["class"=>"danger" , "text"=>"Invald"];
+        }else{
+            return ["class"=>"warning" , "text"=>"En cours"];
+        }
     }
 
     public function suspect(){
@@ -80,9 +87,13 @@ class IdentityCheck extends Model
         }
     }
 
-    public function getStatus(){
+    public function SuspectMandatStatus(){
         $latestSuspect = SuspectMandat::where('code',$this->code)->orderBy('id','desc')->first();
         return $latestSuspect;
+    }
+
+    public function getStatus(){
+            return $this->hasMany(SuspectMandat::class, 'code', 'code'); // Laravel 8+
     }
 
     public function getStatusListe(){
@@ -90,4 +101,12 @@ class IdentityCheck extends Model
         return $latestSuspect;
     }
 
+    public function getAllPictures(){
+       $mandats = Kyc::where('code', $this->code)->pluck("image_cin");
+       return $mandats;
+    }
+
+     public function getAmount(){
+        return "null";
+    }
 }

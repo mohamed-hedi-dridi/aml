@@ -34,16 +34,20 @@ class AgentController extends Controller
                 $agent->tel = $request->tel;
                 $agent->state_id = $request->state_id;
                 $agent->statut = 1;
-                $agent->activity = "";
+                $agent->activity = NULL;
                 $agent->wu = $request->wu;
                 if($agent->save()){
                     $agentRec = new AgentReclamation();
                     $agentRec->nom = $request->name;
                     $agentRec->email = $request->email;
                     $agentRec->tel = $request->tel;
+                    $agentRec->agentID_easy = $request->agentID_easy;
                     $agentRec->id_state = $request->state_id;
-                    $agentRec->activity = "";
-                    $agentRec->id_user = 10;
+                    $agentRec->activity = NULL;
+                    $agentRec->id_user = Auth::user()->id;
+                    $agentRec->CorrespLocID = $request->CorrespLocID;
+                    $agentRec->POSPassWord = $request->POSPassWord;
+                    $agentRec->agentID = $request->agentID;
                     $agentRec->western = $request->wu;
                     $agentRec->save();
                 }
@@ -58,8 +62,32 @@ class AgentController extends Controller
         }
     }
 
-    public function edit(Request $request){
-
+    public function edit(Request $request ,$email){
+        try {
+            $agentRec = AgentReclamation::where('email',$email)->first();
+            $agentRec->western = $request->wu ;
+            $agentRec->CorrespLocID = $request->CorrespLocID ;
+            $agentRec->agentID = $request->agentID ;
+            $agentRec->agentID_easy = $request->agentID_easy ;
+            $agentRec->POSPassWord = $request->POSPassWord ;
+            if($agentRec->save()){
+                $agent = Agent::where('email',$email)->first();
+                $agent->wu = $request->wu ;
+                if($agentRec->save()){
+                    Log::channel('info')->info("Edit Agent :".$agentRec->name, ['user' => Auth::user()->name] );
+                    return redirect()->back()->with( ['status' => 'success' , 'message' => 'Agent Update avec success!'] );
+                }else{
+                    Log::channel('error')->error("Échec de la mise à jour de l'agent.", ['user' => Auth::user()->name, 'email' => $email]);
+                    return redirect()->back()->with(['status' => 'error', 'message' => 'Échec de la mise à jour de l\'agent.']);
+                }
+            }else{
+                Log::channel('error')->error("Échec de la mise à jour de l'agent de réclamation.", ['user' => Auth::user()->name, 'email' => $email]);
+                return redirect()->back()->with(['status' => 'error', 'message' => 'Échec de la mise à jour de l\'agent.']);
+            }
+        } catch (\Exception  $e) {
+            Log::channel('error')->error($e->getMessage(), ['user' => Auth::user()->name ,'line' => $e->getLine()]);
+            return redirect()->back()->with( ['status' => 'error' , 'message' => $e->getMessage()] );
+        }
     }
 
     public function updateKYC(Request $request) {
@@ -100,6 +128,14 @@ class AgentController extends Controller
         $agent = Agent::where('email', $email)->first();
         if ($agent != null) {
             return response()->json($response["response"] = true);
+        }
+        return response()->json($response["response"] = false) ;
+    }
+
+    public function getAgent($email){
+        $agent = AgentReclamation::where('email',$email)->first();
+        if ($agent != null) {
+            return response()->json($response["response"] = $agent);
         }
         return response()->json($response["response"] = false) ;
     }

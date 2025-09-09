@@ -2,38 +2,153 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use App\Models\Kyc;
 use App\Models\Western;
 use App\Models\TypeMandat;
 use App\Models\MenuSideBar;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Models\EasyTransfert;
 use App\Models\IdentityCheck;
 use App\Models\SuspectMandat;
 use App\Imports\ImportMandats;
+use App\Models\MandatsCentral;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Http;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Validator;
 
 class MandatController extends Controller
 {
-    public function index($type){
+    public function index(Request $request , $type){
         try {
-            $titre = "Liste des mandats International ";
+            $url = $type ;
+            $type = $request->type_mandat;
+            $startDate = $request->dateDebut ? $request->dateDebut : Carbon::now()->subMonths(0)->startOfMonth()->format("Y-m-d");
+            $endDate = $request->dateFin ? $request->dateFin : Carbon::now()->format("Y-m-d");
+            $titre = "Liste des mandats ";
+            $type_mandat = "All" ;
             if($type == "All"){
-                $westerns = Western::orderBy('date','desc')->get()->unique('code')->take(100);
-                $typemandat = TypeMandat::where("international",1)->pluck("nom")->toarray();
-                $IdentityCheck = IdentityCheck::whereIn('type_mandat',$typemandat)->orderBy('date','desc')->get()->unique('code')->take(100);
+                $type_mandat = "All" ;
+                $westerns = Kyc::select(DB::raw('*'))->whereBetween('date', [$startDate, $endDate]);
+                $IdentityCheck = IdentityCheck::where('type_mandat','!=','Mandat nationale')->whereBetween('date', [$startDate, $endDate]);
+
+                $westerns->when($request->email, fn ($q) =>
+                    $q->where('email_agent' , $request->email)
+                );
+                $westerns->when($request->code, fn ($q) =>
+                    $q->where('code' , $request->code)
+                );
+
+                $westerns->when($request->email, fn ($q) =>
+                    $q->where('email_agent' , $request->email)
+                );
+                $westerns->when($request->code, fn ($q) =>
+                    $q->where('code' , $request->code)
+                );
+
+                $westerns = $westerns->orderByDesc('date')->get()->unique('code');
+                $IdentityCheck = $IdentityCheck->orderBy('date','desc')->get()->unique('code')->take(100);
                 $mandats = $westerns->merge($IdentityCheck)->sortByDesc('date')->all();
                 $type = "International";
             }elseif($type=="Western Union"){
-                $mandats = Western::orderBy('date','desc')->get()->unique('code')->take(100);
+                $type_mandat = "WU" ;
+                $mandats = Kyc::select(DB::raw('*'))->where('type_mandat','WU')->whereBetween('date', [$startDate, $endDate]);
+                $mandats->when($request->email, fn ($q) =>
+                    $q->where('email_agent' , $request->email)
+                );
+                $mandats->when($request->code, fn ($q) =>
+                    $q->where('code' , $request->code)
+                );
+                $mandats = $mandats->orderBy('id','desc')->get()->unique('code');
                 $titre = $titre.$type;
-            }elseif($type != "All"){
-                $mandats = IdentityCheck::where('type_mandat',$type)->orderBy('date','desc')->get()->unique('code')->take(100);
+            }elseif($type=="Ria Money"){
+                $type_mandat = "RIA" ;
+                $mandats = Kyc::where('type_mandat','RIA')->whereBetween('date', [$startDate, $endDate]);
+                $mandats->when($request->email, fn ($q) =>
+                    $q->where('email_agent' , $request->email)
+                );
+                $mandats->when($request->code, fn ($q) =>
+                    $q->where('code' , $request->code)
+                );
+                $mandats = $mandats->orderBy('date','desc')->get()->unique('code');
                 $titre = $titre.$type;
+            }elseif($type=="MoneyGram"){
+                $type_mandat = "MG" ;
+                $mandats = Kyc::where('type_mandat','MG')->whereBetween('date', [$startDate, $endDate]);
+                $mandats->when($request->email, fn ($q) =>
+                    $q->where('email_agent' , $request->email)
+                );
+                $mandats->when($request->code, fn ($q) =>
+                    $q->where('code' , $request->code)
+                );
+                $mandats = $mandats->orderBy('date','desc')->get()->unique('code');
+                $titre = $titre.$type;
+            }elseif($type=="Zepz"){
+                $type_mandat = "Zepz" ;
+                $mandats = Kyc::where('type_mandat','Zepz')->whereBetween('date', [$startDate, $endDate]);
+                $mandats->when($request->email, fn ($q) =>
+                    $q->where('email_agent' , $request->email)
+                );
+                $mandats->when($request->code, fn ($q) =>
+                    $q->where('code' , $request->code)
+                );
+                $mandats = $mandats->orderBy('date','desc')->get()->unique('code');
+                $titre = $titre.$type;
+            }elseif($type=="EasyTransfer"){
+                $type_mandat = "Easy" ;
+                $mandats = Kyc::where('type_mandat','Easy')->whereBetween('date', [$startDate, $endDate]);
+                $mandats->when($request->email, fn ($q) =>
+                    $q->where('email_agent' , $request->email)
+                );
+                $mandats->when($request->code, fn ($q) =>
+                    $q->where('code' , $request->code)
+                );
+                $mandats = $mandats->orderBy('date','desc')->get()->unique('code');
+                $titre = $titre.$type;
+            }elseif($type=="EasyTransferMobile"){
+                $type_mandat = "EasyTransfer" ;
+                $mandats = IdentityCheck::where('type_mandat','EasyTransfer')->whereBetween('date', [$startDate, $endDate]);
+                $mandats->when($request->email, fn ($q) =>
+                    $q->where('email_agent' , $request->email)
+                );
+                $mandats->when($request->code, fn ($q) =>
+                    $q->where('code' , $request->code)
+                );
+                $mandats = $mandats->orderBy('date','desc')->get()->unique('code');
+                $titre = $titre.$type;
+            }elseif($type=="Worldremit"){
+                $type_mandat = "Worldremit" ;
+                $mandats = IdentityCheck::where('type_mandat','Worldremit')->whereBetween('date', [$startDate, $endDate]);
+                $mandats->when($request->email, fn ($q) =>
+                    $q->where('email_agent' , $request->email)
+                );
+                $mandats->when($request->code, fn ($q) =>
+                    $q->where('code' , $request->code)
+                );
+                $mandats = $mandats->orderBy('date','desc')->get()->unique('code');
+                $titre = $titre.$type;
+            }elseif($type=="TapTapSend"){
+                $type_mandat = "TapTapSend" ;
+                $mandats = IdentityCheck::where('type_mandat','TapTapSend')->whereBetween('date', [$startDate, $endDate]);
+                $mandats->when($request->email, fn ($q) =>
+                    $q->where('email_agent' , $request->email)
+                );
+                $mandats->when($request->code, fn ($q) =>
+                    $q->where('code' , $request->code)
+                );
+                $mandats = $mandats->orderBy('date','desc')->get()->unique('code');
+                $titre = $titre.$type;
+            }else{
+                return view('errors.404');
             }
+            $type = $type_mandat;
             Log::channel('info')->info("Acces Liste des mandats ".$type, ['user' => Auth::user()->name] );
-            return view('admin.mandats.index',compact('titre', 'mandats' , 'type'));
+            return view('admin.mandats.index',compact('titre', 'mandats' , 'type', 'url','endDate','startDate'));
         } catch (\Exception $e) {
             Log::channel('error')->error($e->getMessage(), ['user' => Auth::user()->name ,'line' => $e->getLine()]);
             return redirect()->back()->with( ['status' => 'error' , 'message' => $e->getMessage()] );
@@ -50,15 +165,16 @@ class MandatController extends Controller
             //}else{
             //  $mandats = IdentityCheck::all();
             //}
+            $type = 'Mandat nationale';
             Log::channel('info')->info("Acces Liste des mandats National ", ['user' => Auth::user()->name] );
-            return view('admin.mandats.index',compact('titre', 'mandats'));
+            return view('admin.mandats.index',compact('titre', 'mandats','type'));
         } catch (\Exception $e) {
             Log::channel('error')->error($e->getMessage(), ['user' => Auth::user()->name,'line' => $e->getLine()]);
             return redirect()->back()->with( ['status' => 'error' , 'message' => $e->getMessage()] );
         }
     }
 
-    public function import(){
+    public function import(Request $request){
         try {
             $validator = $request->validate([
                 'file' => ['required',"mimes:xlsx,xls"],
@@ -120,14 +236,17 @@ class MandatController extends Controller
 
     public function view($id){
 
-        if(in_array($id[0],["T","W","E","M"])){
+        if(in_array($id[0],["T","W","E","M"]) && $id[1] != "E"){
             $mandat = IdentityCheck::where('code', $id)->first();
+            $type = "mobile";
         }else{
-            $mandat = Western::where('code', $id)->first();
+
+            $mandat = Kyc::where('code', $id)->first();
+            $type = "Web" ;
         }
-        $latestSuspect = $mandat->getStatus();
+        $latestSuspect = $mandat->SuspectMandatStatus();
         $titre = "Mandat : ".$id;
-        return view ('admin.mandats.show', compact('titre','mandat', 'latestSuspect'));
+        return view ('admin.mandats.show', compact('titre','mandat', 'latestSuspect','type'));
     }
 
 
@@ -192,7 +311,7 @@ class MandatController extends Controller
             $Suspect->save();
             return response()->json(['success' => 'Created successfully'],200);
         } catch (\Throwable $th) {
-            Log::channel('error')->error($th->getMessage(), ['line' => $e->getLine()]);
+            Log::channel('error')->error($th->getMessage(), ['line' => $th->getLine()]);
             return response()->json(['errors' => $th->getMessage()], 400);
         }
     }
@@ -200,7 +319,7 @@ class MandatController extends Controller
     public function ajaxListeMandat(Request $request){
         try {
             if($request->type  == "All"){
-                $westerns = new Western ();
+                $westerns = Kyc::select(DB::raw('*'));
                 $typemandat = TypeMandat::where("international",1)->pluck("nom")->toarray();
                 $IdentityCheck = IdentityCheck::whereIn('type_mandat',$typemandat);
                 if ($request->code) {
@@ -214,8 +333,10 @@ class MandatController extends Controller
                 $westerns = $westerns->orderBy('date','desc')->get()->unique('code');
                 $IdentityCheck = $IdentityCheck->orderBy('date','desc')->get()->unique('code');
                 $mandats = $westerns->merge($IdentityCheck)->sortByDesc('date')->all();
-            }elseif($request->type=="Western Union"){
-                $mandats = new Western ();
+            }elseif(in_array($request->type,["WU","RIA","MG","Zepz","Easy"])){
+                //$mandats = Western::with('getStatus')->select(DB::raw('*'))->where('type_mandat',$request->type);
+                $mandats = Kyc::select(DB::raw('*'))->where('type_mandat',$request->type);
+
                 if ($request->code) {
                     $mandats =  $mandats->where("code",'like','%'.$request->code.'%');
                 }
@@ -223,8 +344,10 @@ class MandatController extends Controller
                     $mandats =  $mandats->where("input_identity",'like','%'.$request->input_identity.'%');
                 }
                 $mandats = $mandats->orderBy('date','desc')->get()->unique('code');
-            }elseif($request->type != "All"){
+            }else{
+                //$mandats = IdentityCheck::with('getStatus')->where('type_mandat',$request->type);
                 $mandats = IdentityCheck::where('type_mandat',$request->type);
+
                 if ($request->code) {
                     $mandats = $mandats->where("code",'like','%'.$request->code.'%');
                 }
@@ -233,6 +356,9 @@ class MandatController extends Controller
                 }
                 $mandats = $mandats->orderBy('date','desc')->get()->unique('code');
             }
+
+            //return response()->json(["data" => $mandats]);
+
             return view('admin.mandats.layoutAjax',compact('mandats'));
         } catch (\Throwable $th) {
             Log::channel('error')->error($th->getMessage(), ['user' => Auth::user()->name,'line' => $th->getLine()]);
@@ -240,6 +366,173 @@ class MandatController extends Controller
         }
 
     }
+
+    public function detailAgentMandats(){
+        $type = "all";
+        $titre = "all";
+        $mandats = Kyc::where('email_agent', 'contact.technologies@gmail.com')->where('id','>','246190')->orderBy('date','desc')->get();
+        return view('admin.mandats.indexAll',compact('titre', 'mandats' , 'type'));
+
+    }
+
+
+    public function getWestern(){
+        try {
+            $mandats = Kyc::whereNotIn('type_mandat',['MG','RIA','Easy','SW','Zepz'])->orderBy('date','desc')->get()->unique('code')->take(100);
+            return response()->json($mandats, 200);
+        } catch (\Throwable $th) {
+            return response()->json($th->getMessage(), 400);
+        }
+    }
+
+
+    public function gerenewtable(){
+
+        $westerns = EasyTransfert::where('id','>',1)->limit(3000)->get() ;
+        try {
+            dd($westerns[0]);
+            foreach($westerns as $mandat){
+                //$array = $mandat->toArray();
+                $MandatsCentral = new MandatsCentral();
+                $MandatsCentral->code_mandat = $mandat->code;
+                $MandatsCentral->type_mandat = "MET";
+                $MandatsCentral->montant = $mandat->amount;
+
+                $MandatsCentral->commission_agent = $mandat->commission_agent ;
+                $MandatsCentral->statut_kyc = $mandat->getStatusKYC($mandat->code) ? "true" : "false";
+                //$MandatsCentral->identite_beneficiaire = "" ;
+                $MandatsCentral->email_agent = $mandat->agent  ;
+                $MandatsCentral->date_mandat = $mandat->Date ;
+                $MandatsCentral->statut_remboursement = $mandat->rembourse;
+                $MandatsCentral->type_remboursement = $mandat->type_remboursement;
+                $MandatsCentral->Partner_ID = $mandat->Partner_ID;
+                $MandatsCentral->agent = $mandat->Agent;
+                $MandatsCentral->save();
+            }
+            dd($westerns);
+        } catch (\Throwable $th) {
+            dump($th->getMessage());
+            dd($westerns);
+        }
+    }
+
+
+     public function getImage(Request $request){
+        try {
+           // dd($request->all());
+            $dateSaisie = Carbon::parse($request->date);
+                $currentMonth = now()->month;
+                $currentYear = now()->year;
+                $folder = date('Y-m', strtotime($request->date));
+            if($request->type == "Web"){
+                $array = $this->getImageWeb($request->date);
+                $filename = Str::after($request->filename, 'imagesKYC/');
+                if($array['Status'] == "Success" ){
+                    if (!Storage::disk(@$array['sftp'])->exists(@$array['folder'].$filename)) {
+                        return redirect()->back()->with( ['status' => 'error' , 'message' => "File not found"] );
+                    }
+                    // Récupère le contenu du fichier depuis le serveur SFTP
+                    $fileContent = Storage::disk(@$array['sftp'])->get(@$array['folder'].$filename);
+
+                    // Retourne le fichier en tant que réponse avec un téléchargement
+                    return Response::make($fileContent, 200, [
+                        'Content-Type' => 'image/jpeg', // Le type MIME de l'image (à ajuster selon le format de l'image)
+                        'Content-Disposition' => 'attachment; filename="' . basename($filename) . '"',
+                    ]);
+                }
+            }else{
+                $array = $this->getImageMobile($request->date);
+                $filename = Str::after($request->filename, 'images/');
+                if($array['Status'] == "Success" ){
+                    if (!Storage::disk(@$array['sftp'])->exists(@$array['folder'].$filename)) {
+                        return redirect()->back()->with( ['status' => 'error' , 'message' => "File not found"] );
+                    }
+                    // Récupère le contenu du fichier depuis le serveur SFTP
+                    $fileContent = Storage::disk(@$array['sftp'])->get(@$array['folder'].$filename);
+
+                    // Retourne le fichier en tant que réponse avec un téléchargement
+                    return Response::make($fileContent, 200, [
+                        'Content-Type' => 'image/jpeg', // Le type MIME de l'image (à ajuster selon le format de l'image)
+                        'Content-Disposition' => 'attachment; filename="' . basename($filename) . '"',
+                    ]);
+                }
+            }
+        } catch (\Throwable $e) {
+            Log::channel('error')->error($e->getMessage(), ['user' => Auth::user()->name ,'line' => $e->getLine()]);
+            return redirect()->back()->with( ['status' => 'error' , 'message' => $e->getMessage()] );
+        }
+
+    }
+
+
+    private function getImageWeb($date){
+
+        $date = Carbon::parse($date);
+
+        $limit1 = Carbon::parse('2024-07-01');
+        $limit2 = Carbon::parse('2025-03-01');
+        $now = Carbon::now();
+
+        if ($date->isSameMonth($now)) {
+            $sftp = 'sftp_current_web';
+            $folder = "";
+        } elseif ($date->greaterThanOrEqualTo($limit2)) {
+            // cas 1 : date >= 2025-03-01
+            $sftp = 'sftp_old_web';
+            $folder = $date->format('Y-m').'/';
+        } elseif ($date->between($limit1, $limit2)) {
+            // cas 2 : entre 2024-07-01 et 2025-02-28
+            $sftp = 'sftp_old_web';
+            $folder = "imagesKYC/";
+        } elseif ($date->lessThan($limit1)) {
+            // cas 3 : < 2024-07-01
+            $sftp = 'sftp_old_web';
+            $folder = "2024-mois01_06/imagesKYC/";
+        } else {
+            return [
+                'Status'=>'error'
+            ];
+        }
+
+        return [
+                'Status'=>'Success',
+                'sftp' => $sftp ,
+                'folder' => $folder ,
+            ];
+    }
+
+
+    private function getImageMobile($date){
+
+        $date = Carbon::parse($date);
+        $limit1 = Carbon::parse('2025-03-01');
+        $now = Carbon::now();
+
+        if ($date->isSameMonth($now)) {
+            $sftp = 'sftp_current_mobile';
+            $folder = "";
+        } elseif ($date->greaterThanOrEqualTo($limit1)) {
+            // cas 1 : date >= 2025-03-01
+            $sftp = 'sftp_old_mobile';
+            $folder = $date->format('Y-m').'/';
+        } elseif ($date->lessThan($limit1)) {
+            // cas 3 : < 2024-07-01
+            $sftp = 'sftp_old_mobile';
+            $folder = "images/";
+        } else {
+            return [
+                'Status'=>'error'
+            ];
+        }
+
+        return [
+                'Status'=>'Success',
+                'sftp' => $sftp ,
+                'folder' => $folder ,
+            ];
+    }
+
+
 }
 
 
