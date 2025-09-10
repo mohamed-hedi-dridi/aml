@@ -419,11 +419,7 @@ class MandatController extends Controller
 
      public function getImage(Request $request){
         try {
-           // dd($request->all());
-            $dateSaisie = Carbon::parse($request->date);
-                $currentMonth = now()->month;
-                $currentYear = now()->year;
-                $folder = date('Y-m', strtotime($request->date));
+
             if($request->type == "Web"){
                 $array = $this->getImageWeb($request->date);
                 $filename = Str::after($request->filename, 'imagesKYC/');
@@ -441,6 +437,7 @@ class MandatController extends Controller
                     ]);
                 }
             }else{
+
                 $array = $this->getImageMobile($request->date);
                 $filename = Str::after($request->filename, 'images/');
                 if($array['Status'] == "Success" ){
@@ -532,6 +529,28 @@ class MandatController extends Controller
             ];
     }
 
+    public function getImageListe($value){
+            $request = Kyc::where('code', $value)->first();
+            if("Web" == "Web"){
+                $array = $this->getImageWeb($request->date);
+                $filename = Str::after($request->image_cin, 'imagesKYC/');
+                if($array['Status'] == "Success" ){
+                    if (!Storage::disk(@$array['sftp'])->exists(@$array['folder'].$filename)) {
+                        return redirect()->back()->with( ['status' => 'error' , 'message' => "File not found"] );
+                    }
+                    // Récupère le contenu du fichier depuis le serveur SFTP
+                    $fileContent = Storage::disk(@$array['sftp'])->get(@$array['folder'].$filename);
+
+                    // Retourne le fichier en tant que réponse avec un téléchargement
+                    return Response::make($fileContent, 200, [
+                        'Content-Type' => 'image/jpeg', // Le type MIME de l'image (à ajuster selon le format de l'image)
+                        'Content-Disposition' => 'attachment; filename="' . basename($filename) . '"',
+                    ]);
+                }
+            }
+
+
+    }
 
 }
 

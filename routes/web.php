@@ -129,6 +129,6 @@ Route::group(['prefix' => 'admin','App\Http\Controllers' => 'NationUnisControlle
 
 });
 
-Route::get("getImageKWY", [MandatController::class , 'getImageKWY']) ;
+Route::get("Image/{value}", [MandatController::class , 'getImageListe']) ;
 
 require __DIR__.'/auth.php';
