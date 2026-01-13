@@ -51,27 +51,36 @@
                                 <thead>
                                     <tr>
                                         <td style="width:10%">#</td>
-                                        <td style="width:45%">Nom rôle</td>
-                                        <td style="width:45%">Action</td>
+                                        <td style="width:20%">Nom rôle</td>
+                                        <td style="width:70%">Permissions</td>
+                                        <td style="width:20%">Action</td>
                                     </tr>
-                                    @php
-                                        $i=1;
-                                    @endphp
-                                    <tbody>
-                                        @foreach ($roles as $role )
-                                            <tr>
-                                                <td style="width:20%">{{ $i++ }}</td>
-                                                <td style="width:40%">{{ ucfirst($role->name) }}</td>
-                                                <td style="width:40%">
-                                                    @can("Attribut permissions")
-                                                        <a class="btn btn-primary btn-sm scroll-click" href="{{ route('admin.roles.edit',$role) }}"> Attribuer Permissions </a>
-                                                    @endcan
-                                                </td>
-                                            </tr>
-                                        @endforeach
-
-                                    </tbody>
                                 </thead>
+                                @php
+                                    $i=1;
+                                @endphp
+                                <tbody>
+                                    @foreach ($roles as $role )
+                                        @php
+                                            $permissions = $role->getPermissionNames();
+                                        @endphp
+                                        <tr>
+                                            <td style="width:10%">{{ $i++ }}</td>
+                                            <td style="width:20%">{{ ucfirst($role->name) }}</td>
+                                            <td style="width:70%">
+                                                @foreach ($permissions as $key=>$permissions )
+                                                    <span class="badge badge-success">{{ ucfirst($permissions) }}</span>
+                                                @endforeach
+                                            </td>
+                                            <td style="width:20%">
+                                                @can("Attribut permissions")
+                                                    <a class="btn btn-primary btn-sm scroll-click" href="{{ route('admin.roles.edit',$role) }}"> Attribuer Permissions </a>
+                                                @endcan
+                                            </td>
+                                        </tr>
+                                    @endforeach
+
+                                </tbody>
                             </table>
                         </div>
                     </div>

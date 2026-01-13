@@ -5,16 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RiaMoney extends Model
+class DetailsLookupResp extends Model
 {
     use HasFactory;
     protected $connection = 'transferInternationalPostFending';
     public $timestamps = false;
-    protected $table = 'ria_details';
-
-
-    public function getStatusKYC($code){
-        $latestSuspect = KYC::where('code',$code)->orderBy('id','asc')->exists();
-        return $latestSuspect;
-    }
+    protected $table = 'details_lookup_resp';
 }

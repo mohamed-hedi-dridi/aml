@@ -5,16 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RiaMoney extends Model
+class MoneyGramValidationReq extends Model
 {
     use HasFactory;
     protected $connection = 'transferInternationalPostFending';
     public $timestamps = false;
-    protected $table = 'ria_details';
+    protected $table = 'receive_validation_req';
 
-
-    public function getStatusKYC($code){
-        $latestSuspect = KYC::where('code',$code)->orderBy('id','asc')->exists();
-        return $latestSuspect;
+    public function validationReq()
+    {
+        return $this->belongsTo(MoneyGram::class, 'reference_number' , 'reference_number');
     }
 }

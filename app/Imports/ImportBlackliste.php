@@ -21,10 +21,11 @@ class ImportBlackliste implements ToCollection
         DB::connection('DB_Prod')->beginTransaction();
         try {
             if(strtolower($rows[0][0])=="prenom" && strtolower($rows[0][1])== "nom" && strtolower($rows[0][2])== "date" && strtolower($rows[0][3])== "cin" && strtolower($rows[0][4])== "dead"){
-                $Blacklist = Blacklist::query()->update(['old' => 1]);
+                Blacklist::query()->delete();
+                BlacklistProd::query()->delete();
                 foreach ($rows as $key => $row) {
                     if($key>0){
-                        if($this->Verif($row) == true){
+                        //if($this->Verif($row) == true){
                             $dateObj = \DateTime::createFromFormat('d/m/Y', $row[2]);
                             if($dateObj != false){
                                 $nouvelleDate = $dateObj->format('d-m-Y');
@@ -45,11 +46,11 @@ class ImportBlackliste implements ToCollection
                                 "CIN"=>$row[3],
                                 "Dead"=>$row[4]
                             ]);
-                        }else{
+                        /*}else{
                             DB::connection('mysql')->rollBack();
                             DB::connection('DB_Prod')->rollBack();
                             return 0 ;
-                        }
+                        }*/
                     }
 
                 }

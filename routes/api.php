@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\MandatController;
@@ -25,7 +26,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/Users', [UserController::class, 'alluser'])->middleware('permission:View All Users');
 });
 
-Route::post('/login', [UserController::class, 'login']);
+Route::get('/login', [UserController::class, 'login']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/users', [UserController::class, 'index'])->name('admin.users.index')->middleware('permission:View All Users');
     Route::get('/users/create', [UserController::class, 'create'])->name('admin.users.create')->middleware('permission:Add User');
@@ -39,3 +40,20 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
 Route::get('/Western', [MandatController::class, 'getWestern']);
 
+Route::get('/getMatch', [UserController::class, 'getMatch']);
+
+Route::get("/generateWestern",[MandatController::class, 'generateWestern']);
+Route::get("/generateZepz",[MandatController::class, 'generateZepz']);
+Route::get("/generateRia",[MandatController::class, 'generateRia']);
+Route::get("/generateMET",[MandatController::class, 'generateMET']);
+Route::get("/generateMG",[MandatController::class, 'generateMG']);
+
+Route::get('/calculRisque', [MandatController::class , 'calculRisque']);
+
+Route::get('/testmail', function(){
+    Mail::raw('Test SMTP Laravel', function ($message) {
+        $message->to('m.dridi@viamobile.tn')
+                ->subject('SMTP Test');
+    });
+
+});

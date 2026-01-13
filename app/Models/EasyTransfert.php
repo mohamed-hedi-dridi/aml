@@ -17,4 +17,9 @@ class EasyTransfert extends Model
     {
         return $this->belongsTo(Agent::class, 'agent', 'email');
     }
+
+    public function getStatusKYC($code){
+        $latestSuspect = KYC::where('code',$code)->orderBy('id','asc')->first();
+        return $latestSuspect;
+    }
 }

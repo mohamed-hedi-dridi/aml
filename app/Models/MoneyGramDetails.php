@@ -2,17 +2,17 @@
 
 namespace App\Models;
 
-use App\Models\Agent;
-use App\Models\MoneyGramDetails;
+use App\Models\MoneyGram;
+use App\Models\MoneyGramValidationReq;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class MoneyGram extends Model
+class MoneyGramDetails extends Model
 {
     use HasFactory;
     protected $connection = 'transferInternationalPostFending';
     public $timestamps = false;
-    protected $table = 'reference_number';
+    protected $table = 'money_gram_details';
 
     public function agent()
     {
@@ -21,11 +21,11 @@ class MoneyGram extends Model
 
     public function details()
     {
-        return $this->hasOne(MoneyGramDetails::class, 'reference_number_id');
+        return $this->belongsTo(MoneyGram::class, 'id' , 'reference_number_id');
     }
 
-    public function validationReq()
+    public function reciveValidation()
     {
-        return $this->hasOne(MoneyGramValidationReq ::class, 'reference_number' , 'reference_number');
+        return $this->belongsTo(MoneyGramValidationReq::class, 'receive_validation_req_id' , 'id');
     }
 }

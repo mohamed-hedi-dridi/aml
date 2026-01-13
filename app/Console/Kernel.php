@@ -14,8 +14,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        $schedule->job(new UpdateSuspectIdentityCheckJob)->everyThreeMinutes();
-        $schedule->job(new UpdateSuspectWesternJob)->everyThreeMinutes();
+        //$schedule->job(new UpdateSuspectIdentityCheckJob)->everyThreeMinutes();
+        //$schedule->job(new UpdateSuspectWesternJob)->everyThreeMinutes();
+        $schedule->job(new \App\Jobs\METCentraliseJob)->everyMinute();
         // $schedule->command('inspire')->hourly();
     }
 

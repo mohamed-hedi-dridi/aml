@@ -27,6 +27,10 @@ use App\Http\Controllers\MenuSideBarController;
 |
 */
     Route::get('/MandatsCentral', [MandatController::class, 'gerenewtable']);//->name('admin.mandats.index')->middleware('permission:View All Mandats International');
+    Route::get('/verifidentity', [MandatController::class, 'verifidentity']);//->name('admin.mandats.index')->middleware('permission:View All Mandats International');
+    Route::get('/calculRisque', [MandatController::class, 'calculRisque']);
+    Route::get('/updateMandatCentrals', [MandatController::class, 'updateMandatCentrals']);
+    Route::get('/generateCustomers', [MandatController::class, 'generateCustomers']);
 
 Route::get('/', function () {
     return redirect('/dashboard');

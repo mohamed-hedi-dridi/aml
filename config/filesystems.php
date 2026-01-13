@@ -67,11 +67,11 @@ return [
 
         'sftp_current_web' => [
             'driver' => 'sftp',
-            'host' => '10.90.90.68',
+            'host' => '10.100.100.11',
             'port' => 22,
-            'username' => 'viauser1',
-            'password' => 'V!@mb&9048US',
-            'root' => '/home/viauser1/KYC/imagesKYC/', // répertoire racine sur le serveur
+            'username' => 'user',
+            'password' => '7eJy+&k4VE48+Ek*',
+            'root' => '/home/user/KYC', // répertoire racine sur le serveur
         ],
 
         // SFTP for old files
@@ -81,7 +81,7 @@ return [
             'username' => 'user',
             'password' => 'testt', // stored in .env
             'root' => '/home/storage/KYCWeb/',
-            'timeout' => 60,
+            'timeout' => 6000,
         ],
 
         'sftp_current_mobile' => [

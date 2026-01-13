@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Kyc;
 use App\Models\Agent;
 use App\Models\SuspectMandat;
 use Illuminate\Support\Facades\Log;
@@ -12,11 +13,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Western extends Model
 {
     use HasFactory;
-    //protected $connection = 'Post_Funding_DB';
+    protected $connection = 'Post_Funding_DB';
     public $timestamps = false;
+    protected $table = 'Western_Union';
+    //protected $connection = 'localhostdb';
     //protected $table = 'Western_Union';
-    protected $connection = 'localhostdb';
-    protected $table = 'zepz';
 
     public function getCSS($statut){
         if($statut == 0){
@@ -99,7 +100,7 @@ class Western extends Model
     }
 
     public function getStatusKYC($code){
-        $latestSuspect = KYC::where('code',$code)->orderBy('id','asc')->exists();
+        $latestSuspect = Kyc::where('code',$code)->orderBy('id','asc')->exists();
         return $latestSuspect;
     }
 }

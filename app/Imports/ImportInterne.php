@@ -20,26 +20,22 @@ class ImportInterne implements ToCollection
         DB::connection('mysql')->beginTransaction();
         DB::connection('DB_Prod')->beginTransaction();
         if(strtoupper($rows[0][0])=="REF" && strtoupper($rows[0][1])== "NOM_PRENOM" && strtoupper($rows[0][2])== "CIN"){
+            Log::channel('info')->info("file recived", ['user' => Auth::user()->name ]);
             try {
-                $InternVm = InternVm::query()->update(['old' => 1]);
+                InternVm::query()->delete();
+                InternVmProd::query()->delete();
                 foreach ($rows as $key => $row) {
                     if($key>0){
-                        if($this->Verif($row)){
-                            InternVm::create ([
-                                "Ref"=>$row[0],
-                                "NOM_PRENOM"=>$row[1],
-                                "CIN"=>$row[2]
-                            ]);
-                            InternVmProd::create ([
-                                "Ref"=>$row[0],
-                                "NOM & PRENOM"=>$row[1],
-                                "CIN"=>$row[2]
-                            ]);
-                        }else{
-                            DB::connection('mysql')->rollBack();
-                            DB::connection('DB_Prod')->rollBack();
-                            return 0 ;
-                        }
+                        InternVm::create ([
+                            "Ref"=>$row[0],
+                            "NOM_PRENOM"=>$row[1],
+                            "CIN"=>$row[2]
+                        ]);
+                        InternVmProd::create ([
+                            "Ref"=>$row[0],
+                            "NOM & PRENOM"=>$row[1],
+                            "CIN"=>$row[2]
+                        ]);
                     }
                 }
                 DB::connection('mysql')->commit();
@@ -49,6 +45,8 @@ class ImportInterne implements ToCollection
                 DB::connection('mysql')->rollBack();
                 DB::connection('DB_Prod')->rollBack();
             }
+        }else{
+            Log::channel('info')->info("file recived", ['user' => Auth::user()->name , "header" => $rows[0] ]);
         }
     }
 

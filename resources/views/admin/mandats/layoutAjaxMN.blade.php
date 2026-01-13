@@ -21,15 +21,7 @@
                 <div class="form-group mb-0 col-4">
                     <label>Type mandat : </label>
                     <select class="form-control type_mandat" name="type_mandat">
-                        <option @if ($url == "All") selected @endif value="All"> All </option>
-                        <option @if ($url == "Western Union") selected @endif value="Western Union"> Western Union </option>
-                        <option @if ($url == "Ria Money") selected @endif value="Ria Money"> RIA </option>
-                        <option @if ($url == "MoneyGram") selected @endif value="MoneyGram"> MG </option>
-                        <option @if ($url == "EasyTransferMobile") selected @endif value="EasyTransferMobile"> My Easy Transfert Mobile</option>
-                        <option @if ($url == "EasyTransfer") selected @endif value="EasyTransfer"> My Easy Transfert </option>
-                        <option @if ($url == "Zepz") selected @endif> Zepz </option>
-                        <option @if ($url == "Worldremit") selected @endif> Worldremit </option>
-                        <option @if ($url == "TapTapSend") selected @endif> TapTapSend </option>
+                        <option selected value="mandats_national"> Mandats national </option>
                     </select>
                 </div>
                 <div class="form-group mt-4 col-3">

@@ -180,16 +180,23 @@ class UserController extends Controller
     }
 
     public function login(Request $request){
+        return response()->json([
+                "status" => "success",
+                "message" =>"valid User"
+            ]);
+        Log::channel('info')->info("Acces Liste Des Agents", $request->all() );
         if(!Auth::attempt($request->only('email','password'))){
             return response([
+                "status" => "error",
                 "message" =>"invalid User"
             ],Response::HTTP_UNAUTHORIZED);
         }
-        $user = Auth::user();
-        $token = $user->createToken('token')->plainTextToken;
+        //$user = Auth::user();
+        //$token = $user->createToken('token')->plainTextToken;
         return response([
-            "token" => $token ,
-            "user" => $user
+            "status" => "success",
+            //"token" => $token ,
+            //"user" => $user
         ]);
     }
 
@@ -202,5 +209,45 @@ class UserController extends Controller
             return response ( ['status' => 'error' , 'message' => $e->getMessage()] );
         }
 
+    }
+
+
+    public function getMatch(Request $request){
+        $data[0] =  [
+            "team1" =>"CLUB AFRICAIN" ,
+            "team2" => "EST",
+            "date" => "2025-11-10",
+            "venue" => "rtyui",
+            "status" => "encours"
+        ];
+
+        $data[1] =  [
+            "team1" =>"CLUB AFRICAIN" ,
+            "team2" => "EST",
+            "date" => "2025-11-10",
+            "venue" => "rtyui",
+            "status" => "encours"
+        ];
+        $data[2] =  [
+            "team1" =>"CLUB AFRICAIN" ,
+            "team2" => "EST",
+            "date" => "2025-11-10",
+            "venue" => "rtyui",
+            "status" => "encours"
+        ];
+        $data[3] =  [
+            "team1" =>"CLUB AFRICAIN" ,
+            "team2" => "EST",
+            "date" => "2025-11-10",
+            "time" => "2025-11-10",
+            "venue" => "rtyui",
+            "status" => "encours"
+        ];
+        return response([
+            "status" => "success",
+            "matches" => $data
+            //"token" => $token ,
+            //"user" => $user
+        ]);
     }
 }

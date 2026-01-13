@@ -21,7 +21,8 @@ class ImportCTAF implements ToCollection
         DB::connection('DB_Prod')->beginTransaction();
         if(strtoupper($rows[0][0])=="NUM_PASSPORT" && strtoupper($rows[0][1])== "NOM_PRENOM"){
             try {
-                $ctaf = Ctaf::query()->update(['old' => 1]);
+                Ctaf::query()->delete();
+                CtafProd::query()->delete();
                 foreach ($rows as $key => $row) {
                     if($key>0){
                         if(true == true){

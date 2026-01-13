@@ -198,4 +198,10 @@ class Kyc extends Model
         }
 
     }
+
+
+    public function listeIterationKYC($code){
+        $listeIteration =  $this::where('code',$code)->orderBy('id','desc')->get()->toArray();
+        return $listeIteration;
+    }
 }

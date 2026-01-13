@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use App\Models\Kyc;
 use App\Models\Agent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 
 class Zepz extends Model
 {
@@ -16,5 +18,10 @@ class Zepz extends Model
     public function agent()
     {
         return $this->belongsTo(Agent::class, 'email_agent', 'email');
+    }
+
+    public function getStatusKYC($code){
+        $latestSuspect = Kyc::where('code',$code)->orderBy('id','asc')->exists();
+        return $latestSuspect;
     }
 }
